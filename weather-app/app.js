@@ -1,10 +1,23 @@
-const request = require('request');
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
 
-const url = 'https://api.darksky.net/forecast/99713afcac68f6144b7063925f764289/37.8267,-122.4233';
-const mapboxurl = 'https://api.mapbox.com/geocoding/v5/mapbox.places/Los%20Angeles.json?access_token=pk.eyJ1IjoiaXNpbW9ueGQiLCJhIjoiY2p4ZHdyYXFtMGlzdDN6bnYxYmZmcW8waCJ9.fqxq_9PIt2YLJOXSzYuY3Q';
+const address = process.argv[2]
 
+if (!address) {
+    console.log('Please provide an address')
+} else {
+    geocode(address, (error, { latitude, longitude, location }) => {
+        if (error) {
+            return console.log(error)
+        }
 
-request({ url: url }, (error, response) => {
-    const data = JSON.parse(response.body)
-    console.log(data.currently)
-})
+        forecast(latitude, longitude, (error, forecastData) => {
+            if (error) {
+                return console.log(error)
+            }
+
+            console.log(location)
+            console.log(forecastData)
+        })
+    })
+}
